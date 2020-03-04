@@ -1,0 +1,27 @@
+--cpu Cortex-M4.fp
+"plata_330_pgrm\startup_stm32f411xe.o"
+"plata_330_pgrm\main.o"
+"plata_330_pgrm\stm32f4xx_it.o"
+"plata_330_pgrm\stm32f4xx_hal_msp.o"
+"plata_330_pgrm\stm32f4xx_hal_spi.o"
+"plata_330_pgrm\stm32f4xx_hal_tim.o"
+"plata_330_pgrm\stm32f4xx_hal_tim_ex.o"
+"plata_330_pgrm\stm32f4xx_hal_rcc.o"
+"plata_330_pgrm\stm32f4xx_hal_rcc_ex.o"
+"plata_330_pgrm\stm32f4xx_hal_flash.o"
+"plata_330_pgrm\stm32f4xx_hal_flash_ex.o"
+"plata_330_pgrm\stm32f4xx_hal_flash_ramfunc.o"
+"plata_330_pgrm\stm32f4xx_hal_gpio.o"
+"plata_330_pgrm\stm32f4xx_hal_dma_ex.o"
+"plata_330_pgrm\stm32f4xx_hal_dma.o"
+"plata_330_pgrm\stm32f4xx_hal_pwr.o"
+"plata_330_pgrm\stm32f4xx_hal_pwr_ex.o"
+"plata_330_pgrm\stm32f4xx_hal_cortex.o"
+"plata_330_pgrm\stm32f4xx_hal.o"
+"plata_330_pgrm\stm32f4xx_hal_exti.o"
+"plata_330_pgrm\stm32f4xx_hal_uart.o"
+"plata_330_pgrm\system_stm32f4xx.o"
+--library_type=microlib --strict --scatter "plata_330_pgrm\plata_330_pgrm.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "plata_330_pgrm.map" -o plata_330_pgrm\plata_330_pgrm.axf
