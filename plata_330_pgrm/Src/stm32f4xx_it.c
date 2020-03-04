@@ -48,6 +48,7 @@ extern u8 EVENT_INT5;
 extern u8 EVENT_INT6;
 extern u8 EVENT_INT7;
 extern u8 EVENT_INT8;
+extern u16 time_uart;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
@@ -176,6 +177,7 @@ void SysTick_Handler(void)
   TIMER1++;
   TIME_SYS++;
   TIME_TEST++;
+  time_uart++;
 }
 
 /******************************************************************************/

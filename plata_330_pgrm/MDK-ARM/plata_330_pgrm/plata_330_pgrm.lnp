@@ -21,7 +21,7 @@
 "plata_330_pgrm\stm32f4xx_hal_exti.o"
 "plata_330_pgrm\stm32f4xx_hal_uart.o"
 "plata_330_pgrm\system_stm32f4xx.o"
---library_type=microlib --strict --scatter "plata_330_pgrm\plata_330_pgrm.sct"
+--strict --scatter "plata_330_pgrm\plata_330_pgrm.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "plata_330_pgrm.map" -o plata_330_pgrm\plata_330_pgrm.axf

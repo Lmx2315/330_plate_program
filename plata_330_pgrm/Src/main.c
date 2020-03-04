@@ -96,7 +96,7 @@ unsigned     char FLAG_lenght;//
 unsigned     int sch_lenght_data;
 unsigned     char FLAG_DATA;
 unsigned char FLAG_CW;
-float time_uart; //
+u16 time_uart=0; //
 unsigned char flag_pcf;
 char lsym1;
 char pack_ok1;
@@ -121,6 +121,9 @@ static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_TIM1_Init(void);
+u32 IO    (char* );
+void Menu1(char);
+
 
 /**
   * @brief System Clock Configuration
@@ -254,7 +257,6 @@ static void MX_TIM1_Init(void)
   /* USER CODE END TIM1_Init 0 */
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
@@ -263,9 +265,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
+  htim1.Init.Prescaler = 1999;//даёт период 500мкс * 2000 = 1 сек
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0;
+  htim1.Init.Period = 49999;//на частоте 100 МГц даёт период 500 мкс
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -282,12 +284,6 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_TRIGGER;
-  sSlaveConfig.InputTrigger = TIM_TS_ITR1;
-  if (HAL_TIM_SlaveConfigSynchro(&htim1, &sSlaveConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
@@ -295,7 +291,7 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 10000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -499,7 +495,7 @@ unsigned int leng ( char *s)
   return i;
 }
 
-void Transf(char* s)  // РїСЂРѕС†РµРґСѓСЂР° РѕС‚РїСЂР°РІРєРё СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РІ РїРѕСЂС‚
+void Transf(char* s)  // процедура отправки строки символов в порт
 {
   unsigned  short l=0;
   unsigned  short i=0;
@@ -576,7 +572,7 @@ void x32_out (char s[],u32 a)
    Transf ("\r\n");
 }
 
-void x_out (char s[],u32 a)//Р±С‹Р»Рѕ u64 
+void x_out (char s[],u32 a)//было u64 
 {
    Transf (s);
    sprintf (strng,"%X",a);
@@ -585,7 +581,7 @@ void x_out (char s[],u32 a)//Р±С‹Р»Рѕ u64
    Transf ("\r\n");
 }
 
-void xn_out (char s[],u32 a)//Р±С‹Р»Рѕ u64 
+void xn_out (char s[],u32 a)//было u64 
 {
    Transf (s);
    sprintf (strng,"%X",a);
@@ -649,8 +645,8 @@ if (HAL_UART_GetState(&huart1)!=HAL_UART_STATE_BUSY_TX )
 	 {
 		k = text_lengh;
 		HAL_UART_Transmit_DMA(&huart1,text_buffer,k);
-		text_lengh=0u;  //РѕР±РЅСѓР»РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР° Р±СѓС„РµСЂР° 
-		flag_pachka_TXT=1; //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі РїРµСЂРµРґР°С‡Рё
+		text_lengh=0u;  //обнуление счётчика буфера 
+		flag_pachka_TXT=1; //устанавливаем флаг передачи
 	  }
   }	
 } 
@@ -668,13 +664,13 @@ char getchar1(void)
  void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
  //-------------------------  
-   rx_buffer1[rx_wr_index1++]= (uint8_t) (RX_uBUF[0]& 0xFF); //СЃС‡РёС‚С‹РІР°РµРј РґР°РЅРЅС‹Рµ РІ Р±СѓС„РµСЂ, РёРЅРєСЂРµРјРµРЅС‚РёСЂСѓСЏ С…РІРѕСЃС‚ Р±СѓС„РµСЂР°
-   if ( rx_wr_index1 == RX_BUFFER_SIZE1) rx_wr_index1=0; //РёРґРµРј РїРѕ РєСЂСѓРіСѓ
+   rx_buffer1[rx_wr_index1++]= (uint8_t) (RX_uBUF[0]& 0xFF); //считываем данные в буфер, инкрементируя хвост буфера
+   if ( rx_wr_index1 == RX_BUFFER_SIZE1) rx_wr_index1=0; //идем по кругу
    	 
-	  if (++rx_counter1 == RX_BUFFER_SIZE1) //РїРµСЂРµРїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР°
+	  if (++rx_counter1 == RX_BUFFER_SIZE1) //переполнение буфера
       {
-        rx_counter1=0; //РЅР°С‡РёРЅР°РµРј СЃРЅР°С‡Р°Р»Р° (СѓРґР°Р»СЏРµРј РІСЃРµ РґР°РЅРЅС‹Рµ)
-        rx_buffer_overflow1=1;  //СЃРѕРѕР±С‰Р°РµРј Рѕ РїРµСЂРµРїРѕР»РЅРµРЅРёРё
+        rx_counter1=0; //начинаем сначала (удаляем все данные)
+        rx_buffer_overflow1=1;  //сообщаем о переполнении
       }
 	  
  //--------------------------  
@@ -687,7 +683,8 @@ void UART_conrol (void)
  u16 j=0;
 
   if (rx_counter1!=0u)
-    {   
+    {  
+//		Transf("*");
       if (rx_counter1<BUFFER_SR) j = rx_counter1; else j=BUFFER_SR;
 
       for (i=0u;i<j; i++) 
@@ -697,15 +694,192 @@ void UART_conrol (void)
            if (sr[i]==';') {break;}
           }
             sr[lenght]=0x00;
-         //   IO (sr);
-        };
+		//	Transf(sr);
+            IO (sr);
+    };
 }
+
+u32 crc_input=0u; 
+u32 crc_comp=0u;
+
+u32 IO ( char* str)      // функция обработки протокола обмена
+{
+	  u32 ccc;
+	  char *ch;
+ unsigned int i=0;
+ u8 tmp1;
+ u32 lb;
+ u64 v1;
+ u32 z1,z2;
+
+  i = lenght;//длинна принятой пачки
+  if (lenght==0) i = leng(str);
+  lenght = 0;
+ 
+  indexZ = 0;
+  
+  if ((time_uart>50u)||(SCH_LENGHT_PACKET>MAX_PL))
+  {
+	  //-------------------
+		packet_flag=0; 
+		//-------------------
+		time_uart=0u;  //обнуление счётчика тайм аута
+		index1=0u; 
+		crc_ok=0; 
+		packet_ok=0; 
+		index_word=0u; 
+		index_data_word =1u;
+		index_data_word2=1u;
+		data_flag =0;
+		data_flag2=0;
+		FLAG_lenght=0u;
+		lenght_data=0u;
+		sch_lenght_data=0u;
+		DATA_Word [0]=' ';
+		DATA_Word2[0]=' ';
+		FLAG_CW = 0u; //флаг управляющего байта, снимается сразу после исполнения
+		FLAG_DATA = 0u;
+		SCH_LENGHT_PACKET=0;
+  }
+  
+  while (i>0u)   //перегрузка принятого пакета в массив обработки
+  
+  {  
+
+	if ((str[indexZ]==0x7e)&&(packet_flag==0))// обнаружено начало пакета
+	  {  
+		//-------------------
+		packet_flag=1; 
+		//-------------------
+		time_uart=0u;  //обнуление счётчика тайм аута
+		index1=0u; 
+		crc_ok=0; 
+		packet_ok=0; 
+		index_word=0u; 
+		index_data_word =1u;
+		index_data_word2=1u;
+		data_flag =0;
+		data_flag2=0;
+		FLAG_lenght=0u;
+		lenght_data=0u;
+		sch_lenght_data=0u;
+		DATA_Word [0]=' ';
+		DATA_Word2[0]=' ';
+		FLAG_CW = 0u; //флаг управляющего байта, снимается сразу после исполнения
+		FLAG_DATA = 0u;
+		SCH_LENGHT_PACKET=0;		
+	  }
+
+	 InOut[index1]=str[indexZ];
+	 SCH_LENGHT_PACKET++;//подсчитываем длинну пакета
+		 
+	if (( InOut[index1]==';')&&(FLAG_DATA==0u)&&(packet_flag==1))  {packet_flag=0;packet_ok=1u;FLAG_CW=1u;}
+    
+	if (((InOut[index1]=='=')||(InOut[index1]==':'))&&(data_flag==0)) {data_flag=1u;FLAG_CW=1u;}
+
+	if (( InOut[index1]=='.')&&(data_flag2==0)&&(FLAG_DATA==0))   {data_flag2=1u; FLAG_CW=1u;}
+	
+	if (( InOut[index1]=='$')&&(FLAG_lenght==0u)) {FLAG_lenght=2u;FLAG_CW=1u;}
+    
+	if ((index1>2u)&&(InOut[2]==' ')&&(FLAG_CW==0u)&&(FLAG_lenght<2u))  
+            {
+                             if   (data_flag!=1u) {Word[index_word]=InOut[index1];} // заполняем командное слово
+                      
+                             if  ((data_flag==1u)&&(data_flag2==0u))     DATA_Word[index_data_word]=InOut[index1];// заполняем  слово данных1
+                             if  ((data_flag==1u)&&(data_flag2==1u))     DATA_Word2[index_data_word2]=InOut[index1]; // заполняем  слово данных2
+                    
+                             if  (data_flag!=1u)
+                                     {if (index_word<buf_Word) index_word++;} 
+                                   else 
+                                            {
+                                             if ((data_flag==1u)&&(data_flag2==0u)) if (index_data_word<buf_DATA_Word)  {index_data_word++;sch_lenght_data++;}
+                                            
+                                             if ((data_flag==1u)&&(data_flag2==1u)) if (index_data_word2<buf_DATA_Word) index_data_word2++;
+                                            }
+			}
+	
+		if ((FLAG_lenght==2u)&&(FLAG_CW==0u)) {lenght_data = (u8)(InOut[index1]);FLAG_lenght=1u;} //запоминаем длинну пакета данных после ":"
+	
+		if ((sch_lenght_data<lenght_data)&&(FLAG_lenght==1u)) FLAG_DATA = 1u; else {FLAG_DATA = 0u;}
+	 
+		if (index1<BUFFER_SR)  index1++;
+		if (indexZ <BUFFER_SR)  indexZ ++;
+		i--;
+		FLAG_CW=0u;
+	
+  }
+ 
+
+if (packet_ok==1u) 
+  {    
+      if (InOut[0]==0x7e)   crc_ok=crc_ok|0x1;   // проверка первого условия пакета - начало пакета
+      if (InOut[1]==Adress) crc_ok=crc_ok|0x2;   // проверка второго условия пакета - адресат назначения
+ 
+if (crc_ok==0x3)  //обработка команд адресатом которых является хозяин 
+{
+
+if (strcmp(Word,"help")==0)                     
+   {
+     Transf ("принял help\r"    );
+     Transf("\r");  
+     Menu1(0);
+   } else
+if (strcmp(Word,"custom_phy_wr")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		crc_input=atoi(DATA_Word2);
+		u_out ("принял custom_phy_wr:",crc_comp);
+    } 
+      } 
+	  for (i=0u;i<buf_Word;i++)               Word[i]     =0x0;
+      for (i=0u;i<buf_DATA_Word;  i++)   DATA_Word[i]     =0x0;
+      for (i=0u;i<buf_DATA_Word;  i++)  DATA_Word2[i]     =0x0;  
+      for (i=0u;i<BUFFER_SR;i++)  
+      {
+        InOut[i]     =0x0;
+      }  
+      
+	  time_uart=0;  //обнуление счётчика тайм аута
+      packet_flag=0; 
+      index1=0u; 
+      crc_ok=0; 
+      i=0;
+      packet_ok=0; 
+      index_word=0u; 
+      index_data_word=0u;
+      data_flag=0;
+      index_data_word2=0u;
+      data_flag2	 =0;
+      indexZ 		 =0u;
+      FLAG_lenght    =0u;
+      lenght_data    =0u;
+      sch_lenght_data=0u;
+      FLAG_CW   = 0u; //флаг управляющего байта, снимается сразу после исполнения
+      FLAG_DATA = 0u;	  
+      	  
+      DATA_Word [0]=' ';
+      DATA_Word2[0]=' ';
+	  SCH_LENGHT_PACKET=0;
+  }
+
+  if ((packet_ok==1)&&(crc_ok==0x1))     //обработка команд адресатом которых является слейв
+
+  {
+    
+    if (Master_flag==0)
+
+      {            
+         
+      }
+  }  
+  return  crc_input;         
+} 
 
 void LED (void)
 {
 	static u8 z=1;
 	
-	if ((TIMER1<100)&&(FLAG_T1==0)) 
+	if ((TIMER1<200)&&(FLAG_T1==0)) 
 	{
 		LED1(0);
 		LED2(1);
@@ -716,7 +890,7 @@ void LED (void)
 		if (z!=0) z=z<<1; else z=1;
 	}
 	
-	if ((TIMER1>200)&&(FLAG_T2==0)) 
+	if ((TIMER1>400)&&(FLAG_T2==0)) 
 	{
 		LED1(0);
 		LED2(0);
@@ -724,16 +898,18 @@ void LED (void)
 		
 		FLAG_T2=1;
 		FLAG_T1=0;
+
 	}
 	
-	if ((TIMER1>400))
+	if ((TIMER1>800))
 	{
 		LED1(1);
 		LED2(0);
 		LED3(0);
 	}
-	
-	if (TIMER1>500)	TIMER1=0;
+
+
+	if (TIMER1>1000)	TIMER1=0;
 }
 
 u8 PIN_control_PD13 (void)
@@ -761,41 +937,41 @@ void Menu1(char a)
 //***************************************************************************
     int i;  
  
-  for (i=0;i<20;i++) Transf("\r");    // РѕС‡РёСЃС‚РєР° С‚РµСЂРјРёРЅР°Р»Р°
-  for (i=0; i<20; i++) Transf ("-");  // РІС‹РІРѕРґ РїСЂРёРІРµС‚СЃС‚РІРёСЏ
+  for (i=0;i<20;i++) Transf("\r");    // очистка терминала
+  for (i=0; i<20; i++) Transf ("-");  // вывод приветствия
   Transf("\r");
-  Transf("..........Terminal РўРµСЃС‚РѕРІРѕР№ РїР»Р°С‚С‹.........\r\n");
+  Transf("..........Terminal Тестовой платы.........\r\n");
   Transf("\r");
   Transf("MENU :\r");
   Transf("-------\r");
-  Transf("Р Р°СЃС€РёС„СЂРѕРІРєР° СЃС‚СЂСѓРєС‚СѓСЂС‹ РєРѕРјР°РЅРґС‹:\r");
-  Transf("~ - СЃС‚Р°СЂС‚РѕРІС‹Р№ Р±Р°Р№С‚\r");
-  Transf("1 - Р°РґСЂРµСЃ Р°Р±РѕРЅРµРЅС‚Р°\r");
-  Transf(";- РєРѕРЅРµС† РїР°С‡РєРё \r");
+  Transf("Расшифровка структуры команды:\r");
+  Transf("~ - стартовый байт\r");
+  Transf("1 - адрес абонента\r");
+  Transf(";- конец пачки \r");
   Transf(".............. \r");
   Transf("---------------------------------------------\r\n");
-  Transf("IP  :192.168.1.163 - IP Р°РґСЂРµСЃ    Р±Р»РѕРєР°\r");
-  Transf("PORT:2054          - РЅРѕРјРµСЂ РїРѕСЂС‚Р° Р±Р»РѕРєР°\r");
-  Transf("~0 help; - С‚РµРєСѓС‰РµРµ РјРµРЅСЋ\r");
-  Transf("~0 info; - РёРЅС„РѕСЂРјР°С†РёСЏ \r");
+  Transf("IP  :192.168.1.163 - IP адрес    блока\r");
+  Transf("PORT:2054          - номер порта блока\r");
+  Transf("~0 help; - текущее меню\r");
+  Transf("~0 info; - информация \r");
   Transf("~0 dac1_init; - \r");
-  Transf("~0 dac1_r:0;   - С‡С‚РµРЅРёРµ СЂРµРіРёСЃС‚СЂР°\r");
-  Transf("~0 dac1_w:0.0; - Р·Р°РїРёСЃСЊ СЂРµРіРёСЃС‚СЂР°\r");
-  Transf("~0 dac1_serdes_pll:1; - РѕС‡РёСЃС‚РєР° СЂРµРіРёСЃС‚СЂР° СЃРёРіРЅР°Р»Р° Р·Р°С…РІР°С‚Р° PLL Serdes\r");
+  Transf("~0 dac1_r:0;   - чтение регистра\r");
+  Transf("~0 dac1_w:0.0; - запись регистра\r");
+  Transf("~0 dac1_serdes_pll:1; - очистка регистра сигнала захвата PLL Serdes\r");
   Transf("~0 dac1_info:0; \r");
   Transf("~0 dac1_init:0; \r");
   Transf("~0 dac1_phy_wr:0; \r");
   Transf("~0 dac1_phy_info; \r");
-  Transf("~0 lmk_sync; - sync РЅР° LMK\r");
-  Transf("~0 init_lmk; - init РЅР° LMK\r");
+  Transf("~0 lmk_sync; - sync на LMK\r");
+  Transf("~0 init_lmk; - init на LMK\r");
   Transf("-------------------------------------------\r");
   Transf("\r");
   Transf("\r");
   Transf("++++++++++++++++++++\r");
   Transf("\r");
   Transf("\r");
-  //for (i=0; i<64; i++) zputs ("*",1);  // РІС‹РІРѕРґ РїСЂРёРІРµС‚СЃС‚РІРёСЏ
-  //for (i=0;i<10;i++) puts("\r",1);  // РѕС‡РёСЃС‚РєР° С‚РµСЂРјРёРЅР°Р»Р°
+  //for (i=0; i<64; i++) zputs ("*",1);  // вывод приветствия
+  //for (i=0;i<10;i++) puts("\r",1);  // очистка терминала
   Transf("\r");
   //*******************************************************************************
 }
@@ -808,10 +984,8 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-
   /* Configure the system clock */
   SystemClock_Config();
-
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -822,11 +996,15 @@ int main(void)
   MX_USART1_UART_Init();
   
   HAL_UART_Receive_IT(&huart1,RX_uBUF,1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   
+  Transf("\r\n");
   Transf("-------------\r\n");
   Transf("    prg 330  \r\n");
   Transf("-------------\r\n");
-
+  
+  Adress=0x30; //адресс кассеты
   WDOG(1);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -836,7 +1014,7 @@ int main(void)
 	  WDOG(w_var);
 	  LED();
 	  UART_conrol();
- 
+	  UART_DMA_TX();
   }
 
 }

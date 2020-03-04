@@ -52,9 +52,9 @@ void Error_Handler(void);
 #define PD0_1  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,GPIO_PIN_SET)
 
 
-#define LED1(a) ((a==1)?PC13_1 : PC13_0)
-#define LED2(a) ((a==1)?PC14_1 : PC14_0)
-#define LED3(a) ((a==1)?PC15_1 : PC15_0)
+#define LED1(a) ((a!=0)?PC13_1 : PC13_0)
+#define LED2(a) ((a!=0)?PC14_1 : PC14_0)
+#define LED3(a) ((a!=0)?PC15_1 : PC15_0)
 
 #define CS(a) 	((a==1)?PD0_1 : PD0_0)
 #define WDOG(a) ((a!=0)?PB5_1 : PB5_0)
