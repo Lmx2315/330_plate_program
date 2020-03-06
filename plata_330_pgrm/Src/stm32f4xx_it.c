@@ -35,6 +35,7 @@ extern UART_HandleTypeDef huart1;
 extern u32 TIME_SYS;
 extern u32 TIME_TEST;
 extern uint32_t TIMER1;
+extern uint32_t TIMER2;
 extern u8 flag_pachka_TXT; //устанавливаем флаг передачи
 extern volatile unsigned int rx_wr_index1,rx_rd_index1,rx_counter1;
 extern volatile u32 SysTickDelay; 
@@ -172,9 +173,11 @@ void SysTick_Handler(void)
 {
   HAL_IncTick();
   
-   if (SysTickDelay != 0) {SysTickDelay--;}  
+  if (SysTickDelay != 0) {SysTickDelay--;}  
+  if (TIMER1<0xfffffff0) TIMER1++;
+  if (TIMER2<0xfffffff0) TIMER2++;
+ 
   timer_DMA2++;
-  TIMER1++;
   TIME_SYS++;
   TIME_TEST++;
   time_uart++;

@@ -78,6 +78,44 @@ void Error_Handler(void);
 #define MAX_PL 			157u
 
 //------------------------------------------------
+/*
+#define WRITE_ENABLE	0b00000110
+#define WRITE_DISABLE	0b00000100
+#define READ_STATUS		0b00000101
+#define READ_BYTES		0b00000011   //address bytes:3 (25 MHz)
+#define READ_ID			0b10101011	 //Dummy bytes  :3
+#define FAST_READ		0b00001011   //address bytes:3 , Dummy bytes:1        (40 MHz)
+#define WRITE_STATUS	0b00000001
+#define WRITE_BYTES		0b00000010	 //address bytes:3 , Data bytes :1 to 256 (25 MHz)
+#define ERASE_BULK		0b11000111
+#define ERASE_SECTOR	0b11011000 	 //address bytes:3 (25 MHz)
+#define READ_DEV_ID		0b10011111   //Dummy bytes  :2
+*/
+#define WRITE_ENABLE	0x6
+#define WRITE_DISABLE	0x4
+#define READ_STATUS		0x5
+#define READ_BYTES		0x3    
+#define READ_ID			0xab	  
+#define FAST_READ		0x0b    
+#define WRITE_STATUS	0x01
+#define WRITE_BYTES		0x02	 
+#define ERASE_BULK		0xc7
+#define ERASE_SECTOR	0xd8	  
+#define READ_DEV_ID		0x9f    
+
+//------------------------------------------------
+
+u8 PIN_control_PD13 (void);
+u8 PIN_control_PD15 (void);
+u32 IO    (char* );
+void Menu1(char);
+void Delay( unsigned int );
+void Transf(char* ); 
+void LED_OFF (void);
+void spi_EPCS_rd    (u8 ,u8 *,     u32 );		//чтение статуса, без записи адреса но с dummy байтами
+void spi_EPCS_read  (u8 ,u32 ,u8 *,u32 );		//чтение с адресом
+void spi_EPCS_write (u8 ,u32 ,u8 *,u32 );
+void spi_EPCS_wr_ENABLE (void);
 
 #ifdef __cplusplus
 }

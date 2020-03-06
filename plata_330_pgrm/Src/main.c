@@ -40,6 +40,7 @@ u32 TIME_TEST;
 u32 FLAG_T1;
 u32 FLAG_T2;
 uint32_t TIMER1;
+uint32_t TIMER2;
 volatile u32  SysTickDelay; 
 
 uint8_t RX_uBUF[1];
@@ -121,8 +122,7 @@ static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_TIM1_Init(void);
-u32 IO    (char* );
-void Menu1(char);
+
 
 
 /**
@@ -476,6 +476,72 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
+u8 spisend8 (u8 d) //8 бит
+{
+	u8 a1;
+	u8  b;
+  //HAL_SPI_TransmitReceive(&hspi3, &address, &data, sizeof(data), 5000);
+
+  a1 = (d)      &0xff;
+  
+  HAL_SPI_TransmitReceive(&hspi3, &a1, &b,1, 5000); 
+  return b; 
+}
+
+//----------------------------------------------
+void spi_EPCS_rd (u8 cmd,u8 d[],u32 n) //чтение данных
+{  
+   u32 i=0;
+   CS(0);
+   spisend8(cmd);//
+   for (i=0;i<n;i++)  
+   {
+//	   Transf(".");
+	   d[i]=spisend8(0);  
+   }
+   CS(1);
+}
+
+void spi_EPCS_read (u8 cmd,u32 adr,u8 d[],u32 n) //чтение данных
+{  
+   u32 i=0;
+   CS(0);
+   spisend8(cmd);//
+   spisend8((adr>>16)&0xff);//
+   spisend8((adr>> 8)&0xff);//
+   spisend8( adr     &0xff);//
+   for (i=0;i<n;i++)  
+   {
+	   Transf(".");
+	   d[i]=spisend8(0);  
+   }
+   CS(1);
+}
+
+void spi_EPCS_write (u8 cmd,u32 adr,u8 d[],u32 n) //запись данных
+{  
+   u32 i=0;
+   CS(0);  
+   spisend8(cmd);//
+   spisend8((adr>>16)&0xff);//
+   spisend8((adr>> 8)&0xff);//
+   spisend8( adr     &0xff);//
+   
+   for (i=0;i<n;i++)  
+   {
+	   Transf(".");
+	   spisend8(d[i]);  
+   }
+   CS(1);
+}
+void spi_EPCS_wr_ENABLE (void) //разрешение записи во флеш
+{  
+   u32 i=0;
+   CS(0);  
+   spisend8(WRITE_ENABLE);//
+   CS(1);
+}
+//------------------------------------------------
 void Delay( unsigned int Val)  
 {  
    SysTickDelay = Val;  
@@ -701,6 +767,7 @@ void UART_conrol (void)
 
 u32 crc_input=0u; 
 u32 crc_comp=0u;
+u8 mas[300];
 
 u32 IO ( char* str)      // функци€ обработки протокола обмена
 {
@@ -817,19 +884,75 @@ if (packet_ok==1u)
  
 if (crc_ok==0x3)  //обработка команд адресатом которых €вл€етс€ хоз€ин 
 {
-
+	
 if (strcmp(Word,"help")==0)                     
    {
-     Transf ("прин€л help\r"    );
+     Transf ("принял help\r"    );
      Transf("\r");  
      Menu1(0);
    } else
-if (strcmp(Word,"custom_phy_wr")==0) //
+if (strcmp(Word,"EPCS_ID")==0) //не поддерживается EPCS128 !!!
+   {
+		Transf ("\r\nпринял EPCS_ID:\r\n");
+		spi_EPCS_rd(READ_ID,mas,4);
+		Transf ("\r\n");
+		x_out("mas[3]:",mas[3]);
+    } else
+if (strcmp(Word,"EPCS_DEV_ID")==0) //only for EPCS128 !!!
+   {
+		Transf ("\r\nпринял EPCS_DEV_ID:\r\n");
+		spi_EPCS_rd(READ_DEV_ID,mas,3);
+		Transf ("\r\n");
+		if (mas[2]==0x18) Transf("recive: EPCS128\r\n");
+		x_out("mas[2]:",mas[2]);
+    } else
+if (strcmp(Word,"EPCS_STATUS")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		u_out ("прин€л custom_phy_wr:",crc_comp);
-    } 
+		Transf ("\r\nпринял EPCS_STATUS:\r\n");
+		spi_EPCS_rd(READ_STATUS,mas,4);
+		Transf ("\r\n");
+		x_out("mas[0]:",mas[0]);
+		x_out("mas[1]:",mas[1]);
+		x_out("mas[2]:",mas[2]);
+		x_out("mas[3]:",mas[3]);
+    }  else
+if (strcmp(Word,"EPCS_READ")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		crc_input=atoi(DATA_Word2);
+		x_out ("\r\nпринял EPCS_READ:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		
+		spi_EPCS_read(READ_BYTES,crc_comp,mas,256);//чтение 256 байт данных
+		Transf("\r\n---------------------------\r\n");
+		for (i=0;i<256;i++)
+		{
+			hn_out (mas[i],3);hn_out (mas[i],2);hn_out (mas[i],1);hn_out (mas[i],0);
+			i=i+3;
+			Transf("\r\n");	
+		}	
+    }else
+if (strcmp(Word,"EPCS_WRITE_TEST")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		crc_input=atoi(DATA_Word2);
+		x_out ("\r\nпринял EPCS_WRITE_TEST:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		Transf("\r\n---------------------------\r\n");
+		
+		for (i=0;i<256;i++) mas[i]=i;
+			
+		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
+		spi_EPCS_write(WRITE_BYTES,crc_comp,mas,256);
+    }else
+if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		x_out ("\r\nпринял EPCS_ERASE_SECTOR:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+
+		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
+		spi_EPCS_write(ERASE_SECTOR,crc_comp,mas,0);
+    } 		
       } 
 	  for (i=0u;i<buf_Word;i++)               Word[i]     =0x0;
       for (i=0u;i<buf_DATA_Word;  i++)   DATA_Word[i]     =0x0;
@@ -877,39 +1000,39 @@ if (strcmp(Word,"custom_phy_wr")==0) //
 
 void LED (void)
 {
-	static u8 z=1;
-	
-	if ((TIMER1<200)&&(FLAG_T1==0)) 
+	static u8 z=0;
+	if (TIME_TEST>1000)	
 	{
-		LED1(0);
-		LED2(1);
-		LED3(0);
-		
-		FLAG_T1=1;
-		FLAG_T2=0;
-		if (z!=0) z=z<<1; else z=1;
+		z=~z;
+		LED1(z);
+		TIME_TEST=0;
 	}
-	
-	if ((TIMER1>400)&&(FLAG_T2==0)) 
+}
+
+void LED_OFF (void)
+{
+	if (TIMER1>1000) LED2(1);
+	if (TIMER2>1000) LED3(1);
+}
+
+void BTN1 (void)
+{
+	if (PIN_control_PD13()!=0) 
 	{
-		LED1(0);
 		LED2(0);
-		LED3(1);
-		
-		FLAG_T2=1;
-		FLAG_T1=0;
-
+		TIMER1=0;
+		Transf("BTN_1 !!!\r\n");
 	}
-	
-	if ((TIMER1>800))
+}
+
+void BTN2 (void)
+{
+	if (PIN_control_PD15()!=0) 
 	{
-		LED1(1);
-		LED2(0);
 		LED3(0);
+		TIMER2=0;
+		Transf("BTN_2 !!!\r\n");
 	}
-
-
-	if (TIMER1>1000)	TIMER1=0;
 }
 
 u8 PIN_control_PD13 (void)
@@ -1013,6 +1136,9 @@ int main(void)
 	  w_var=~w_var;
 	  WDOG(w_var);
 	  LED();
+	  BTN1();
+	  BTN2();
+	  LED_OFF();
 	  UART_conrol();
 	  UART_DMA_TX();
   }
