@@ -928,7 +928,7 @@ if (strcmp(Word,"EPCS_READ")==0) //
 		Transf("\r\n---------------------------\r\n");
 		for (i=0;i<256;i++)
 		{
-			hn_out (mas[i],3);hn_out (mas[i],2);hn_out (mas[i],1);hn_out (mas[i],0);
+			hn_out (mas[i+0],0);hn_out (mas[i+1],0);hn_out (mas[i+2],0);hn_out (mas[i+3],0);
 			i=i+3;
 			Transf("\r\n");	
 		}	
