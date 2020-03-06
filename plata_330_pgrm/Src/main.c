@@ -33,7 +33,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 
 TIM_HandleTypeDef htim1;
-
+TIM_HandleTypeDef htim2;
 
 u32 TIME_SYS;
 u32 TIME_TEST;
@@ -122,7 +122,8 @@ static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_TIM1_Init(void);
-
+static void MX_TIM2_Init(void);
+static void MX_USART1_UART_Init(void);
 
 
 /**
@@ -320,8 +321,62 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);
+}
+
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 100000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 1000;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
 
 }
+
 
 /** 
   * Enable DMA controller clock
@@ -952,8 +1007,28 @@ if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
 
 		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
 		spi_EPCS_write(ERASE_SECTOR,crc_comp,mas,0);
-    } 		
-      } 
+    }else
+if (strcmp(Word,"TIM1")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		crc_input=atoi(DATA_Word2);
+		un_out("\r\nпринял TIM1:",crc_comp);
+		u_out(".",crc_input);
+		 htim1.Instance->CCR1=crc_comp;
+    }else
+if (strcmp(Word,"TIM2")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		crc_input=atoi(DATA_Word2);
+		un_out("\r\nпринял TIM2:",crc_comp);
+		u_out(".",crc_input);
+		 htim2.Instance->CCR1=crc_comp;
+		 htim2.Instance->ARR =crc_input;
+    } 
+
+
+	
+   } 
 	  for (i=0u;i<buf_Word;i++)               Word[i]     =0x0;
       for (i=0u;i<buf_DATA_Word;  i++)   DATA_Word[i]     =0x0;
       for (i=0u;i<buf_DATA_Word;  i++)  DATA_Word2[i]     =0x0;  
@@ -1116,11 +1191,12 @@ int main(void)
   MX_SPI2_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
+  MX_TIM2_Init();
   MX_USART1_UART_Init();
   
   HAL_UART_Receive_IT(&huart1,RX_uBUF,1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   
   Transf("\r\n");
   Transf("-------------\r\n");
