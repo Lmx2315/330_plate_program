@@ -733,6 +733,24 @@ void xn_out (char s[],u32 a)//было u64
    Transf(strng);   
 }
 
+void xnz_out (char s[],u32 a)// 
+{
+   Transf (s);
+   sprintf (strng,"%X",a);
+   if (a<0x0f) Transf("0");
+   Transf(strng);   
+}
+
+void xn4z_out (char s[],u32 a)// 
+{
+   Transf (s);
+   sprintf (strng,"%X",a);
+   if (a<0x00f)  Transf("000");else
+   if (a<0x0ff)  Transf("00") ;else
+   if (a<0xfff)  Transf("0")  ;
+   Transf(strng);   
+}
+
 void in_out (u64 a,u8 n)
 {
    u8 c=0;
@@ -841,6 +859,9 @@ u8 EPCS_WR (char m[],u8 port)
 	u8 z  =0; //контрольная сумма
 	char *ch;	
 	
+	u8 CC1=0;
+	u8 CC2=0;
+	
 	if ((m[0]!=':')&&(port==2)) error=1;//проверяем что строка начинается с ":" , если источник PORT - ETH
 	else
 	{
@@ -849,7 +870,7 @@ u8 EPCS_WR (char m[],u8 port)
 		a[1]=m[2];		
 		LL=strtol(a,&ch,16);			//длинна строки в HEX файле
 		CC=CC+LL;		
-		xn_out("",LL);
+		xnz_out("",LL);
 		
 		b[0]=m[3];//AAAA
 		b[1]=m[4];		
@@ -858,15 +879,15 @@ u8 EPCS_WR (char m[],u8 port)
 		
 		AAAA=	strtol(b,&ch,16);		//адрес куда поместить двоичные данные из поля DDDD, если TT=00
 		CC=CC+(AAAA>>8)+(AAAA&0xff);
-		if (AAAA!=0) xn_out("",AAAA); else Transf("0000");
+		xn4z_out("",AAAA);
 		
 		a[0]=m[7];//TT
 		a[1]=m[8];		
 		TT=	strtol(a,&ch,16);			//поле типа	00-двоичные данные,04-запись расширенного адреса
 		CC=CC+TT;
-		xn_out("",TT);
-		
-		if (TT==0x04)  //если пришла строка с расширением адреса
+		xnz_out("",TT);
+		CC1=CC;
+		if (TT==0x04)  //если пришла строка с расширением адреса, тут просто запоминаем адрес
 		{
 			b[0]=m[ 9];//DDDD Старшее слово смещения адреса (0xDDDD0000)
 			b[1]=m[10];		
@@ -875,12 +896,12 @@ u8 EPCS_WR (char m[],u8 port)
 	
 			temp=	strtol(b,&ch,16);//адрес
 			CC=CC+(temp>>8)+(temp&0xff);
-			xn_out("",temp);
+			xn4z_out("",temp);
 			
 			a[0]=m[13];//СС контрольная сумма в конце строки
 			a[1]=m[14];		
 			z=strtol(a,&ch,16);	//
-			xn_out("",z);
+			xnz_out("",z);
 			
 			CC=0-CC;
 			
@@ -902,24 +923,38 @@ u8 EPCS_WR (char m[],u8 port)
 					DD=	strtol(a,&ch,16);
 					CC=CC+DD;    	//расчёт контрольной суммы
 					DATA[j++]=DD;	//переносим данные в промежуточный массив
-					xn_out("",DD);
+					xnz_out("",DD);
 				}
 			
-				a[0]=m[i  ];		//СС контрольная сумма в конце строки
-				a[1]=m[i++];		
+				a[0]=m[  i];		//СС контрольная сумма в конце строки
+				a[1]=m[++i];		
 				z=strtol(a,&ch,16);	//
-				xn_out("",z);
+				xnz_out("",z);
 			} else error=3;
-			
+			CC2=CC;
 			CC=0-CC;
 			
-			Transf("\r\n");
-			u_out("j:",j);
-			x_out(" CC:",CC);
-			x_out("CRC:",z);			
-		}
+//			Transf("\r\n");
+//			u_out("  j:",j);
+//			x_out("CC1:",CC1);
+//			x_out("CC2:",CC2);
+//			x_out(" CC:",CC);
+//			x_out("CRC:",z);			
 		
-		if (CC!=z) error=4; else Transf("програмируем флеш\r\n");
+		
+			if (CC!=z) error=4; 
+			else 
+			{
+				Transf("програмируем флеш\r\n");
+				ADDRES_FLASH=ADDRES_FLASH+AAAA;				//формируем полный 32-битный адрес записи
+				x_out("ADDRES_FLASH:",ADDRES_FLASH);
+				
+				spi_EPCS_wr_ENABLE(); //разрешаем запись во флеш
+				spi_EPCS_write(WRITE_BYTES,ADDRES_FLASH,DATA,LL);
+				spi_EPCS_wr_DISABLE();//запрещаем запись во флеш				
+			}
+			
+		}	
 	}
 	
 	return error;
