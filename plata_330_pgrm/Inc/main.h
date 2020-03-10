@@ -64,6 +64,8 @@ void Error_Handler(void);
 #define u16    unsigned short
 #define u8     uint8_t
 #define uint8  uint8_t
+#define UART 	1
+#define ETH		2
 //---------------------------------------------------------------------
 
 // USART1 Receiver buffer
@@ -72,7 +74,7 @@ void Error_Handler(void);
 
 #define buf_IO   		32u 
 #define buf_Word 		32u 
-#define buf_DATA_Word 	200u 
+#define buf_DATA_Word 	256u 
 #define BUFFER_SR 		200u
 #define BUF_STR 		64
 #define MAX_PL 			157u
@@ -116,6 +118,7 @@ void spi_EPCS_rd    (u8 ,u8 *,     u32 );		//чтение статуса, без
 void spi_EPCS_read  (u8 ,u32 ,u8 *,u32 );		//чтение с адресом
 void spi_EPCS_write (u8 ,u32 ,u8 *,u32 );
 void spi_EPCS_wr_ENABLE (void);
+u8 EPCS_WR (char *,u8);
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi2;
@@ -544,7 +546,6 @@ u8 spisend8 (u8 d) //8 бит
 }
 
 //----------------------------------------------
-spi_EPCS_rd(READ_STATUS,mas,4);
 
 u8 spi_EPCS_STATUS (void)			//счтывает статусный байт во флеш , нулевой бит - бит записи, его проверяем
 {
@@ -552,7 +553,6 @@ u8 spi_EPCS_STATUS (void)			//счтывает статусный байт во флеш , нулевой бит - би
 	spi_EPCS_rd(READ_STATUS,m,1);
 	return m[0];
 }
-
 
 void spi_EPCS_rd (u8 cmd,u8 d[],u32 n) //чтение данных
 {  
@@ -601,7 +601,6 @@ void spi_EPCS_write (u8 cmd,u32 adr,u8 d[],u32 n) //запись данных в один сектор 
 }
 void spi_EPCS_ERASE_BULK (void) //разрешение записи во флеш
 {  
-   u32 i=0;
    CS(0);  
    spisend8(ERASE_BULK);//
    CS(1);
@@ -609,7 +608,6 @@ void spi_EPCS_ERASE_BULK (void) //разрешение записи во флеш
 
 void spi_EPCS_wr_ENABLE (void) //разрешение записи во флеш
 {  
-   u32 i=0;
    CS(0);  
    spisend8(WRITE_ENABLE);//
    CS(1);
@@ -617,7 +615,6 @@ void spi_EPCS_wr_ENABLE (void) //разрешение записи во флеш
 
 void spi_EPCS_wr_DISABLE (void) //разрешение записи во флеш
 {  
-   u32 i=0;
    CS(0);  
    spisend8(WRITE_DISABLE);//
    CS(1);
@@ -732,7 +729,7 @@ void xn_out (char s[],u32 a)//было u64
 {
    Transf (s);
    sprintf (strng,"%X",a);
-//   if (a<10) Transf("0x0"); else Transf("0x");
+   if (a<10) Transf("0");
    Transf(strng);   
 }
 
@@ -819,9 +816,113 @@ char getchar1(void)
         rx_counter1=0; //начинаем сначала (удал€ем все данные)
         rx_buffer_overflow1=1;  //сообщаем о переполнении
       }
-	  
  //--------------------------  
    HAL_UART_Receive_IT(&huart1,RX_uBUF,1);
+}
+
+//----------------------------------------------
+//обаработка пришедшей строки интел-HEX
+
+u32 ADDRES_FLASH=0;
+u8 EPCS_WR (char m[],u8 port)
+{
+	u16 j   =0;
+	u16 i   =0;
+	u16 LL  =0;	//количество байт данных в строке (надо удваивать это значение потому что каждый полубайт передаётся байтом)
+	u16 AAAA=0;	//поле адреса 
+	u16 TT  =0; //поле типа 00-двоичные данные,01-запись является концом файла,02-запись адреса сегмента,03-Start Segment Address Record,04-запись расширенного адреса,05-Start Linear Address Record
+	u8  DD  =0;
+	u8  CC  =0; //контрольная сумма расчётная
+	u8 error=0;
+	u32 temp=0;
+	char a[3]     ={0};
+	char b[5]     ={0};
+	char DATA[128]={0};
+	u8 z  =0; //контрольная сумма
+	char *ch;	
+	
+	if ((m[0]!=':')&&(port==2)) error=1;//проверяем что строка начинается с ":" , если источник PORT - ETH
+	else
+	{
+		Transf(":");
+		a[0]=m[1];//LL
+		a[1]=m[2];		
+		LL=strtol(a,&ch,16);			//длинна строки в HEX файле
+		CC=CC+LL;		
+		xn_out("",LL);
+		
+		b[0]=m[3];//AAAA
+		b[1]=m[4];		
+		b[2]=m[5];
+		b[3]=m[6];
+		
+		AAAA=	strtol(b,&ch,16);		//адрес куда поместить двоичные данные из поля DDDD, если TT=00
+		CC=CC+(AAAA>>8)+(AAAA&0xff);
+		if (AAAA!=0) xn_out("",AAAA); else Transf("0000");
+		
+		a[0]=m[7];//TT
+		a[1]=m[8];		
+		TT=	strtol(a,&ch,16);			//поле типа	00-двоичные данные,04-запись расширенного адреса
+		CC=CC+TT;
+		xn_out("",TT);
+		
+		if (TT==0x04)  //если пришла строка с расширением адреса
+		{
+			b[0]=m[ 9];//DDDD Старшее слово смещения адреса (0xDDDD0000)
+			b[1]=m[10];		
+			b[2]=m[11];
+			b[3]=m[12];
+	
+			temp=	strtol(b,&ch,16);//адрес
+			CC=CC+(temp>>8)+(temp&0xff);
+			xn_out("",temp);
+			
+			a[0]=m[13];//СС контрольная сумма в конце строки
+			a[1]=m[14];		
+			z=strtol(a,&ch,16);	//
+			xn_out("",z);
+			
+			CC=0-CC;
+			
+			Transf("\r\n");
+			x_out(" CC:",CC);
+			x_out("CRC:",z);
+			if (CC!=z) error=2; else ADDRES_FLASH=temp<<16;			
+		} 
+		else 
+		{
+			if (LL<512) //проверка на выход за границу массива
+			{
+				temp=9+(2*LL);
+				
+				for (i=9;i<temp;i++)//собираем данные 
+				{
+					a[0]=m[i  ];	//TT
+					a[1]=m[++i];		
+					DD=	strtol(a,&ch,16);
+					CC=CC+DD;    	//расчёт контрольной суммы
+					DATA[j++]=DD;	//переносим данные в промежуточный массив
+					xn_out("",DD);
+				}
+			
+				a[0]=m[i  ];		//СС контрольная сумма в конце строки
+				a[1]=m[i++];		
+				z=strtol(a,&ch,16);	//
+				xn_out("",z);
+			} else error=3;
+			
+			CC=0-CC;
+			
+			Transf("\r\n");
+			u_out("j:",j);
+			x_out(" CC:",CC);
+			x_out("CRC:",z);			
+		}
+		
+		if (CC!=z) error=4; else Transf("програмируем флеш\r\n");
+	}
+	
+	return error;
 }
 
 void UART_conrol (void)
@@ -852,13 +953,13 @@ u8 mas[300];
 
 u32 IO ( char* str)      // функци€ обработки протокола обмена
 {
-	  u32 ccc;
-	  char *ch;
+//	  u32 ccc;
+//	  char *ch;
  unsigned int i=0;
- u8 tmp1;
- u32 lb;
- u64 v1;
- u32 z1,z2;
+// u8 tmp1;
+// u32 lb;
+// u64 v1;
+// u32 z1,z2;
 
   i = lenght;//длинна прин€той пачки
   if (lenght==0) i = leng(str);
@@ -972,6 +1073,12 @@ if (strcmp(Word,"help")==0)
      Transf("\r");  
      Menu1(0);
    } else
+if (strcmp(Word,"EPCS_WR")==0)                     
+   {
+     Transf ("принял EPCS_WR\r");
+     Transf("\r");  
+     x_out("err:",EPCS_WR(DATA_Word,UART));//UART или ETH
+   } else	
 if (strcmp(Word,"EPCS_ID")==0) //не поддерживается EPCS128 !!!
    {
 		Transf ("\r\nпринял EPCS_ID:\r\n");

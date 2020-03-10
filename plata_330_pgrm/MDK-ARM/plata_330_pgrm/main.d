@@ -32,3 +32,6 @@ plata_330_pgrm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h
 plata_330_pgrm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 plata_330_pgrm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 plata_330_pgrm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+plata_330_pgrm\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+plata_330_pgrm\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+plata_330_pgrm\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
