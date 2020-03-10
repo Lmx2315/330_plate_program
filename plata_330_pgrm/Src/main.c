@@ -544,6 +544,16 @@ u8 spisend8 (u8 d) //8 бит
 }
 
 //----------------------------------------------
+spi_EPCS_rd(READ_STATUS,mas,4);
+
+u8 spi_EPCS_STATUS (void)			//счтывает статусный байт во флеш , нулевой бит - бит записи, его проверяем
+{
+	u8 m[1];
+	spi_EPCS_rd(READ_STATUS,m,1);
+	return m[0];
+}
+
+
 void spi_EPCS_rd (u8 cmd,u8 d[],u32 n) //чтение данных
 {  
    u32 i=0;
@@ -573,7 +583,7 @@ void spi_EPCS_read (u8 cmd,u32 adr,u8 d[],u32 n) //чтение данных
    CS(1);
 }
 
-void spi_EPCS_write (u8 cmd,u32 adr,u8 d[],u32 n) //запись данных
+void spi_EPCS_write (u8 cmd,u32 adr,u8 d[],u32 n) //запись данных в один сектор - 256 байт!!!
 {  
    u32 i=0;
    CS(0);  
@@ -589,11 +599,27 @@ void spi_EPCS_write (u8 cmd,u32 adr,u8 d[],u32 n) //запись данных
    }
    CS(1);
 }
+void spi_EPCS_ERASE_BULK (void) //разрешение записи во флеш
+{  
+   u32 i=0;
+   CS(0);  
+   spisend8(ERASE_BULK);//
+   CS(1);
+}
+
 void spi_EPCS_wr_ENABLE (void) //разрешение записи во флеш
 {  
    u32 i=0;
    CS(0);  
    spisend8(WRITE_ENABLE);//
+   CS(1);
+}
+
+void spi_EPCS_wr_DISABLE (void) //разрешение записи во флеш
+{  
+   u32 i=0;
+   CS(0);  
+   spisend8(WRITE_DISABLE);//
    CS(1);
 }
 //------------------------------------------------
@@ -997,8 +1023,9 @@ if (strcmp(Word,"EPCS_WRITE_TEST")==0) //
 		
 		for (i=0;i<256;i++) mas[i]=i;
 			
-		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
+		spi_EPCS_wr_ENABLE(); //разрешаем запись во флеш
 		spi_EPCS_write(WRITE_BYTES,crc_comp,mas,256);
+		spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
     }else
 if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
    {
@@ -1007,6 +1034,16 @@ if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
 
 		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
 		spi_EPCS_write(ERASE_SECTOR,crc_comp,mas,0);
+		spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
+    }else
+if (strcmp(Word,"EPCS_ERASE_ALL")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		x_out ("\r\nпринял EPCS_ERASE_ALL:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+
+		spi_EPCS_wr_ENABLE ();//разрешаем запись во флеш
+		spi_EPCS_ERASE_BULK();//стираем всё во флеш
+		spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
     }else
 if (strcmp(Word,"TIM1")==0) //
    {
