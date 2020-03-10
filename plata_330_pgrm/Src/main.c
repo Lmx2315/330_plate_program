@@ -841,7 +841,7 @@ char getchar1(void)
 //----------------------------------------------
 //обаработка пришедшей строки интел-HEX
 
-u32 ADDRES_FLASH=0;
+u32 HIGH_ADDRES_FLASH=0;
 u8 EPCS_WR (char m[],u8 port)
 {
 	u16 j   =0;
@@ -853,14 +853,15 @@ u8 EPCS_WR (char m[],u8 port)
 	u8  CC  =0; //контрольная сумма расчётная
 	u8 error=0;
 	u32 temp=0;
+	u32 ADDRES_FLASH=0;
 	char a[3]     ={0};
 	char b[5]     ={0};
-	char DATA[128]={0};
+	u8   DATA[128]={0};
 	u8 z  =0; //контрольная сумма
 	char *ch;	
 	
-	u8 CC1=0;
-	u8 CC2=0;
+//	u8 CC1=0;
+//	u8 CC2=0;
 	
 	if ((m[0]!=':')&&(port==2)) error=1;//проверяем что строка начинается с ":" , если источник PORT - ETH
 	else
@@ -886,7 +887,7 @@ u8 EPCS_WR (char m[],u8 port)
 		TT=	strtol(a,&ch,16);			//поле типа	00-двоичные данные,04-запись расширенного адреса
 		CC=CC+TT;
 		xnz_out("",TT);
-		CC1=CC;
+//		CC1=CC;
 		if (TT==0x04)  //если пришла строка с расширением адреса, тут просто запоминаем адрес
 		{
 			b[0]=m[ 9];//DDDD Старшее слово смещения адреса (0xDDDD0000)
@@ -908,7 +909,7 @@ u8 EPCS_WR (char m[],u8 port)
 			Transf("\r\n");
 			x_out(" CC:",CC);
 			x_out("CRC:",z);
-			if (CC!=z) error=2; else ADDRES_FLASH=temp<<16;			
+			if (CC!=z) error=2; else HIGH_ADDRES_FLASH=temp<<16;			
 		} 
 		else 
 		{
@@ -931,7 +932,7 @@ u8 EPCS_WR (char m[],u8 port)
 				z=strtol(a,&ch,16);	//
 				xnz_out("",z);
 			} else error=3;
-			CC2=CC;
+//			CC2=CC;
 			CC=0-CC;
 			
 //			Transf("\r\n");
@@ -945,13 +946,14 @@ u8 EPCS_WR (char m[],u8 port)
 			if (CC!=z) error=4; 
 			else 
 			{
-				Transf("програмируем флеш\r\n");
-				ADDRES_FLASH=ADDRES_FLASH+AAAA;				//формируем полный 32-битный адрес записи
+				Transf("\r\nпрограмируем флеш:\r\n");
+				ADDRES_FLASH=HIGH_ADDRES_FLASH+AAAA;				//формируем полный 32-битный адрес записи
 				x_out("ADDRES_FLASH:",ADDRES_FLASH);
 				
 				spi_EPCS_wr_ENABLE(); //разрешаем запись во флеш
 				spi_EPCS_write(WRITE_BYTES,ADDRES_FLASH,DATA,LL);
-				spi_EPCS_wr_DISABLE();//запрещаем запись во флеш				
+				spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
+				Transf("\r\n");				
 			}
 			
 		}	
