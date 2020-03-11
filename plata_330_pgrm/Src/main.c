@@ -871,7 +871,7 @@ u8 EPCS_WR (char m[],u8 port)
 		a[1]=m[2];		
 		LL=strtol(a,&ch,16);			//длинна строки в HEX файле
 		CC=CC+LL;		
-		xnz_out("",LL);
+//		xnz_out("",LL);
 		
 		b[0]=m[3];//AAAA
 		b[1]=m[4];		
@@ -880,13 +880,13 @@ u8 EPCS_WR (char m[],u8 port)
 		
 		AAAA=	strtol(b,&ch,16);		//адрес куда поместить двоичные данные из поля DDDD, если TT=00
 		CC=CC+(AAAA>>8)+(AAAA&0xff);
-		xn4z_out("",AAAA);
+//		xn4z_out("",AAAA);
 		
 		a[0]=m[7];//TT
 		a[1]=m[8];		
 		TT=	strtol(a,&ch,16);			//поле типа	00-двоичные данные,04-запись расширенного адреса
 		CC=CC+TT;
-		xnz_out("",TT);
+//		xnz_out("",TT);
 //		CC1=CC;
 		if (TT==0x04)  //если пришла строка с расширением адреса, тут просто запоминаем адрес
 		{
@@ -897,18 +897,18 @@ u8 EPCS_WR (char m[],u8 port)
 	
 			temp=	strtol(b,&ch,16);//адрес
 			CC=CC+(temp>>8)+(temp&0xff);
-			xn4z_out("",temp);
+//			xn4z_out("",temp);
 			
 			a[0]=m[13];//СС контрольная сумма в конце строки
 			a[1]=m[14];		
 			z=strtol(a,&ch,16);	//
-			xnz_out("",z);
+//			xnz_out("",z);
 			
 			CC=0-CC;
 			
-			Transf("\r\n");
-			x_out(" CC:",CC);
-			x_out("CRC:",z);
+//			Transf("\r\n");
+//			x_out(" CC:",CC);
+//			x_out("CRC:",z);
 			if (CC!=z) error=2; else HIGH_ADDRES_FLASH=temp<<16;			
 		} 
 		else 
@@ -924,13 +924,13 @@ u8 EPCS_WR (char m[],u8 port)
 					DD=	strtol(a,&ch,16);
 					CC=CC+DD;    	//расчёт контрольной суммы
 					DATA[j++]=DD;	//переносим данные в промежуточный массив
-					xnz_out("",DD);
+//					xnz_out("",DD);
 				}
 			
 				a[0]=m[  i];		//СС контрольная сумма в конце строки
 				a[1]=m[++i];		
 				z=strtol(a,&ch,16);	//
-				xnz_out("",z);
+//				xnz_out("",z);
 			} else error=3;
 //			CC2=CC;
 			CC=0-CC;
@@ -946,14 +946,15 @@ u8 EPCS_WR (char m[],u8 port)
 			if (CC!=z) error=4; 
 			else 
 			{
-				Transf("\r\nпрограмируем флеш:\r\n");
+//				Transf("\r\nпрограмируем флеш:\r\n");
 				ADDRES_FLASH=HIGH_ADDRES_FLASH+AAAA;				//формируем полный 32-битный адрес записи
 				x_out("ADDRES_FLASH:",ADDRES_FLASH);
 				
-				spi_EPCS_wr_ENABLE(); //разрешаем запись во флеш
+				while (spi_EPCS_STATUS()==1){};	//проверяем что флеш не занята
+				spi_EPCS_wr_ENABLE(); 			//разрешаем запись во флеш
 				spi_EPCS_write(WRITE_BYTES,ADDRES_FLASH,DATA,LL);
-				spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
-				Transf("\r\n");				
+				spi_EPCS_wr_DISABLE();			//запрещаем запись во флеш
+//				Transf("\r\n");				
 			}
 			
 		}	
@@ -1112,8 +1113,8 @@ if (strcmp(Word,"help")==0)
    } else
 if (strcmp(Word,"EPCS_WR")==0)                     
    {
-     Transf ("принял EPCS_WR\r");
-     Transf("\r");  
+//   Transf ("принял EPCS_WR\r");
+//   Transf("\r");  
      x_out("err:",EPCS_WR(DATA_Word,UART));//UART или ETH
    } else	
 if (strcmp(Word,"EPCS_ID")==0) //не поддерживается EPCS128 !!!
