@@ -39,6 +39,15 @@ void Error_Handler(void);
 #define PB5_0  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5,GPIO_PIN_RESET)
 #define PB5_1  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5,GPIO_PIN_SET)
 
+#define PB12_0  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12,GPIO_PIN_RESET)
+#define PB12_1  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12,GPIO_PIN_SET)
+
+#define PB13_0  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13,GPIO_PIN_RESET)
+#define PB13_1  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13,GPIO_PIN_SET)
+
+#define PB15_0  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15,GPIO_PIN_RESET)
+#define PB15_1  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15,GPIO_PIN_SET)
+
 #define PC13_0  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13,GPIO_PIN_RESET)
 #define PC13_1  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13,GPIO_PIN_SET)
 
@@ -51,13 +60,18 @@ void Error_Handler(void);
 #define PD0_0  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,GPIO_PIN_RESET)
 #define PD0_1  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,GPIO_PIN_SET)
 
+#define TDO()  HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_14)
+#define TDI(a) 	((a==1)?PB15_1 : PB15_0)
+#define TCK(a) 	((a==1)?PB13_1 : PB13_0)
+#define TMS(a) 	((a==1)?PB12_1 : PB12_0)
 
 #define LED1(a) ((a!=0)?PC13_1 : PC13_0)
 #define LED2(a) ((a!=0)?PC14_1 : PC14_0)
 #define LED3(a) ((a!=0)?PC15_1 : PC15_0)
 
-#define CS(a) 	((a==1)?PD0_1 : PD0_0)
-#define WDOG(a) ((a!=0)?PB5_1 : PB5_0)
+#define CS(a) 	((a==1)?PD0_1  : PD0_0)
+#define WDOG(a) ((a!=0)?PB5_1  : PB5_0)
+
 
 #define u64 unsigned long long
 #define u32 unsigned int
@@ -66,6 +80,11 @@ void Error_Handler(void);
 #define uint8  uint8_t
 #define UART 	1
 #define ETH		2
+
+typedef enum bool {
+	true    = 0x1,
+	false   = 0x0
+}bool;
 //---------------------------------------------------------------------
 
 // USART1 Receiver buffer

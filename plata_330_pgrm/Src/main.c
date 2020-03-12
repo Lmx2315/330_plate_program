@@ -461,11 +461,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : PB5, PB12,PB13,PB15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  
+    /*Configure GPIO pins : PD13 PD15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_14;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
@@ -532,7 +538,16 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
+//----------------------------------------------
+u8 spi2send8 (u8 d) //8 бит
+{
+	u8 a1;
+	u8  b;
+  a1 = (d)      &0xff;
+  HAL_SPI_TransmitReceive(&hspi2, &a1, &b,1, 5000); 
+  return b; 
+}
+//----------------------------------------------
 u8 spisend8 (u8 d) //8 бит
 {
 	u8 a1;
@@ -1190,6 +1205,14 @@ if (strcmp(Word,"EPCS_ERASE_ALL")==0) //
 		spi_EPCS_ERASE_BULK();//стираем всё во флеш
 		spi_EPCS_wr_DISABLE();//запрещаем запись во флеш
     }else
+if (strcmp(Word,"spi2")==0) //
+   {
+		crc_comp =atoi(DATA_Word);
+		x_out("\r\nпринял spi2:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		TMS(0);
+		x_out("spi2_read:",spi2send8(crc_comp));
+		TMS(1);
+    }else
 if (strcmp(Word,"TIM1")==0) //
    {
 		crc_comp =atoi(DATA_Word);
@@ -1370,7 +1393,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_SPI2_Init();
+//MX_SPI2_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
