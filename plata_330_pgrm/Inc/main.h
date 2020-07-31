@@ -138,6 +138,11 @@ void spi_EPCS_read  (u8 ,u32 ,u8 *,u32 );		//чтение с адресом
 void spi_EPCS_write (u8 ,u32 ,u8 *,u32 );
 void spi_EPCS_wr_ENABLE (void);
 u8 EPCS_WR (char *,u8);
+void x_out (char *,u32);
+void u_out (char *,u32);
+void JTAG_SCAN (void);
+u8 SCAN_N (void);
+
 
 #ifdef __cplusplus
 }

@@ -437,9 +437,9 @@
               <FilePath>../Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>jtag.c</FileName>
+              <FileName>jtag_my.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\jtag.c</FilePath>
+              <FilePath>..\Src\jtag_my.c</FilePath>
             </File>
           </Files>
         </Group>

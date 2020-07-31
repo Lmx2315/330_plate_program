@@ -22,79 +22,15 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 C:\Work_murmansk\STM32_K330\330_plate_program\plata_330_pgrm\MDK-ARM\plata_330_pgrm.uvprojx
-Project File Date:  03/12/2020
+Project File Date:  07/29/2020
 
 <h2>Output:</h2>
 Build target 'plata_330_pgrm'
-compiling jtag.c...
-..\Src\jtag.c(353): error:  #20: identifier "state_follower" is undefined
-        state_follower = new_state;
-..\Src\jtag.c(363): error:  #20: identifier "state_follower" is undefined
-        return state_follower;
-..\Src\jtag.c(369): error:  #20: identifier "end_state_follower" is undefined
-        return end_state_follower;
-..\Src\jtag.c(377): error:  #20: identifier "end_state_follower" is undefined
-        end_state_follower = new_end_state;
-..\Src\jtag.c(385): warning:  #223-D: function "ftdi_write_data" declared implicitly
-        retval = ftdi_write_data(&buf, size);
-..\Src\jtag.c(388): warning:  #223-D: function "x_out" declared implicitly
-                x_out("ftdi_write_data:", ftdi_get_error_string());
-..\Src\jtag.c(388): warning:  #223-D: function "ftdi_get_error_string" declared implicitly
-                x_out("ftdi_write_data:", ftdi_get_error_string());
-..\Src\jtag.c(424): warning:  #223-D: function "ftdi_read_data" declared implicitly
-                retval = ftdi_read_data(buf + *bytes_read,qty - *bytes_read);
-..\Src\jtag.c(427): warning:  #223-D: function "x_out" declared implicitly
-                        x_out("ftdi_read_data:",ftdi_get_error_string());
-..\Src\jtag.c(427): warning:  #223-D: function "ftdi_get_error_string" declared implicitly
-                        x_out("ftdi_read_data:",ftdi_get_error_string());
-..\Src\jtag.c(490): warning:  #177-D: variable "latency_timer" was declared but never referenced
-        uint8_t latency_timer;
-..\Src\jtag.c(555): warning:  #223-D: function "x_out" declared implicitly
-                                        x_out("bits < 8 buf = 0x",usb_rx_buf[rx_offs]);
-..\Src\jtag.c(568): warning:  #223-D: function "jtag_read_buffer" declared implicitly
-                        jtag_read_buffer(buffer, openjtag_scan_result_buffer[res_count].command);
-..\Src\jtag.c(571): warning:  #223-D: function "free" declared implicitly
-                                free(openjtag_scan_result_buffer[res_count].buffer);
-..\Src\jtag.c(588): warning:  #223-D: function "x_out" declared implicitly
-                x_out ("TX Buff offs=", usb_tx_buf_offs);
-..\Src\jtag.c(601): warning:  #223-D: function "DIV_ROUND_UP" declared implicitly
-        if (usb_tx_buf_offs + (DIV_ROUND_UP(length, 8) * 2) >= OPENJTAG_BUFFER_SIZE) {
-..\Src\jtag.c(603): warning:  #223-D: function "x_out" declared implicitly
-                x_out("TX Buff offs=", usb_tx_buf_offs);
-..\Src\jtag.c(649): warning:  #223-D: function "x_out" declared implicitly
-        x_out("reset trst:  ",  cmd->cmd.reset->trst);
-..\Src\jtag.c(667): warning:  #223-D: function "jtag_sleep" declared implicitly
-        jtag_sleep(cmd->cmd.sleep->us);
-..\Src\jtag.c(683): warning:  #223-D: function "x_out" declared implicitly
-        x_out("state move to ", cmd->cmd.statemove->end_state);
-..\Src\jtag.c(700): warning:  #223-D: function "x_out" declared implicitly
-        x_out("scan ends in ", tap_state_name(cmd->cmd.scan->end_state));
-..\Src\jtag.c(700): warning:  #223-D: function "tap_state_name" declared implicitly
-        x_out("scan ends in ", tap_state_name(cmd->cmd.scan->end_state));
-..\Src\jtag.c(704): warning:  #223-D: function "jtag_build_buffer" declared implicitly
-        scan_size = jtag_build_buffer(cmd->cmd.scan, &buffer);
-..\Src\jtag.c(710): warning:  #188-D: enumerated type mixed with another type
-        tap_set_end_state(old_state);
-..\Src\jtag.c(755): warning:  #223-D: function "x_out" declared implicitly
-        x_out("openjtag_execute_command:", cmd->type);
-..\Src\jtag.c(776): warning:  #223-D: function "exit" declared implicitly
-                exit(-1);
-..\Src\jtag.c(782): error:  #20: identifier "jtag_command_queue" is undefined
-        struct jtag_command *cmd = jtag_command_queue;
-..\Src\jtag.c(133): warning:  #177-D: variable "openjtag_vid" was declared but never referenced
-  static uint16_t openjtag_vid = 0x0403;
-..\Src\jtag.c(134): warning:  #177-D: variable "openjtag_pid" was declared but never referenced
-  static uint16_t openjtag_pid = 0x6001;
-..\Src\jtag.c(157): warning:  #177-D: variable "ep_in" was declared but never referenced
-  static unsigned int ep_in, ep_out;
-..\Src\jtag.c(157): warning:  #177-D: variable "ep_out" was declared but never referenced
-  static unsigned int ep_in, ep_out;
-..\Src\jtag.c(501): warning:  #177-D: function "openjtag_init" was declared but never referenced
-  static int openjtag_init(void)
-..\Src\jtag.c(780): warning:  #177-D: function "openjtag_execute_queue" was declared but never referenced
-  static int openjtag_execute_queue(void)
-..\Src\jtag.c: 28 warnings, 5 errors
-"plata_330_pgrm\plata_330_pgrm.axf" - 5 Error(s), 28 Warning(s).
+compiling jtag_my.c...
+linking...
+Program Size: Code=20486 RO-data=858 RW-data=164 ZI-data=11988  
+FromELF: creating hex file...
+"plata_330_pgrm\plata_330_pgrm.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -113,7 +49,6 @@ Package Vendor: ARM
 
    * Component: ARM::CMSIS:CORE:3.40.0
       Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
-Target not created.
 </pre>
 </body>
 </html>

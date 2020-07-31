@@ -1119,10 +1119,24 @@ if (packet_ok==1u)
  
 if (crc_ok==0x3)  //обработка команд адресатом которых €вл€етс€ хоз€ин 
 {
-	
+
+if (strcmp(Word,"JTAG_SCAN")==0)                     
+   {
+	 crc_comp =atoi(DATA_Word);
+     Transf ("прин€л JTAG_SCAN\r"    );
+     Transf("\r");  
+     JTAG_SCAN();
+   } else
+if (strcmp(Word,"JTAG_ID")==0)                     
+   {
+	 crc_comp =atoi(DATA_Word);
+     Transf ("прин€л JTAG_ID\r"    );
+     Transf("\r");  
+     ID_recive (crc_comp);
+   } else	
 if (strcmp(Word,"help")==0)                     
    {
-     Transf ("принял help\r"    );
+     Transf ("прин€л help\r"    );
      Transf("\r");  
      Menu1(0);
    } else
@@ -1134,14 +1148,14 @@ if (strcmp(Word,"EPCS_WR")==0)
    } else	
 if (strcmp(Word,"EPCS_ID")==0) //не поддерживается EPCS128 !!!
    {
-		Transf ("\r\nпринял EPCS_ID:\r\n");
+		Transf ("\r\nприн€л EPCS_ID:\r\n");
 		spi_EPCS_rd(READ_ID,mas,4);
 		Transf ("\r\n");
 		x_out("mas[3]:",mas[3]);
     } else
 if (strcmp(Word,"EPCS_DEV_ID")==0) //only for EPCS128 !!!
    {
-		Transf ("\r\nпринял EPCS_DEV_ID:\r\n");
+		Transf ("\r\nприн€л EPCS_DEV_ID:\r\n");
 		spi_EPCS_rd(READ_DEV_ID,mas,3);
 		Transf ("\r\n");
 		if (mas[2]==0x18) Transf("recive: EPCS128\r\n");
@@ -1151,7 +1165,7 @@ if (strcmp(Word,"EPCS_STATUS")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		Transf ("\r\nпринял EPCS_STATUS:\r\n");
+		Transf ("\r\nприн€л EPCS_STATUS:\r\n");
 		spi_EPCS_rd(READ_STATUS,mas,4);
 		Transf ("\r\n");
 		x_out("mas[0]:",mas[0]);
@@ -1163,7 +1177,7 @@ if (strcmp(Word,"EPCS_READ")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		x_out ("\r\nпринял EPCS_READ:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		x_out ("\r\nприн€л EPCS_READ:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
 		
 		spi_EPCS_read(READ_BYTES,crc_comp,mas,256);//чтение 256 байт данных
 		Transf("\r\n---------------------------\r\n");
@@ -1178,7 +1192,7 @@ if (strcmp(Word,"EPCS_WRITE_TEST")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		x_out ("\r\nпринял EPCS_WRITE_TEST:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		x_out ("\r\nприн€л EPCS_WRITE_TEST:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
 		Transf("\r\n---------------------------\r\n");
 		
 		for (i=0;i<256;i++) mas[i]=i;
@@ -1190,7 +1204,7 @@ if (strcmp(Word,"EPCS_WRITE_TEST")==0) //
 if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
    {
 		crc_comp =atoi(DATA_Word);
-		x_out ("\r\nпринял EPCS_ERASE_SECTOR:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		x_out ("\r\nприн€л EPCS_ERASE_SECTOR:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
 
 		spi_EPCS_wr_ENABLE();//разрешаем запись во флеш
 		spi_EPCS_write(ERASE_SECTOR,crc_comp,mas,0);
@@ -1199,7 +1213,7 @@ if (strcmp(Word,"EPCS_ERASE_SECTOR")==0) //
 if (strcmp(Word,"EPCS_ERASE_ALL")==0) //
    {
 		crc_comp =atoi(DATA_Word);
-		x_out ("\r\nпринял EPCS_ERASE_ALL:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		x_out ("\r\nприн€л EPCS_ERASE_ALL:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
 
 		spi_EPCS_wr_ENABLE ();//разрешаем запись во флеш
 		spi_EPCS_ERASE_BULK();//стираем всё во флеш
@@ -1208,7 +1222,7 @@ if (strcmp(Word,"EPCS_ERASE_ALL")==0) //
 if (strcmp(Word,"spi2")==0) //
    {
 		crc_comp =atoi(DATA_Word);
-		x_out("\r\nпринял spi2:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
+		x_out("\r\nприн€л spi2:",crc_comp);//crc_comp - тут 24-х битный адрес чтения
 		TMS(0);
 		x_out("spi2_read:",spi2send8(crc_comp));
 		TMS(1);
@@ -1217,7 +1231,7 @@ if (strcmp(Word,"TIM1")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		un_out("\r\nпринял TIM1:",crc_comp);
+		un_out("\r\nприн€л TIM1:",crc_comp);
 		u_out(".",crc_input);
 		 htim1.Instance->CCR1=crc_comp;
     }else
@@ -1225,7 +1239,7 @@ if (strcmp(Word,"TIM2")==0) //
    {
 		crc_comp =atoi(DATA_Word);
 		crc_input=atoi(DATA_Word2);
-		un_out("\r\nпринял TIM2:",crc_comp);
+		un_out("\r\nприн€л TIM2:",crc_comp);
 		u_out(".",crc_input);
 		 htim2.Instance->CCR1=crc_comp;
 		 htim2.Instance->ARR =crc_input;

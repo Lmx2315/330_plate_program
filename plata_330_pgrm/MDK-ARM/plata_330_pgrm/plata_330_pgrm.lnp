@@ -3,6 +3,7 @@
 "plata_330_pgrm\main.o"
 "plata_330_pgrm\stm32f4xx_it.o"
 "plata_330_pgrm\stm32f4xx_hal_msp.o"
+"plata_330_pgrm\jtag_my.o"
 "plata_330_pgrm\stm32f4xx_hal_spi.o"
 "plata_330_pgrm\stm32f4xx_hal_tim.o"
 "plata_330_pgrm\stm32f4xx_hal_tim_ex.o"
