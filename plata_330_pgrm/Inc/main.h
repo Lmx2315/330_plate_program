@@ -72,7 +72,8 @@ void Error_Handler(void);
 #define CS(a) 	((a==1)?PD0_1  : PD0_0)
 #define WDOG(a) ((a!=0)?PB5_1  : PB5_0)
 
-
+#define ssize_t long
+#define mode_t unsigned int
 #define u64 unsigned long long
 #define u32 unsigned int
 #define u16    unsigned short
@@ -81,10 +82,20 @@ void Error_Handler(void);
 #define UART 	1
 #define ETH		2
 
+#define ALIGN(x, n) (((x) + (n) - 1) & ~((n) - 1))
+#undef MIN
+#define MIN(x, y)  (((x) < (y)) ? (x) : (y))
+#undef MAX
+#define MAX(x, y)  (((x) > (y)) ? (x) : (y))
+
+typedef unsigned int bool;
+
+/*
 typedef enum bool {
 	true    = 0x1,
 	false   = 0x0
 }bool;
+*/
 //---------------------------------------------------------------------
 
 // USART1 Receiver buffer
@@ -125,13 +136,14 @@ typedef enum bool {
 #define READ_DEV_ID		0x9f    
 
 //------------------------------------------------
+#define STM32F4
 
 u8 PIN_control_PD13 (void);
 u8 PIN_control_PD15 (void);
 u32 IO    (char* );
 void Menu1(char);
 void Delay( unsigned int );
-void Transf(char* ); 
+void Transf(const char* ); 
 void LED_OFF (void);
 void spi_EPCS_rd    (u8 ,u8 *,     u32 );		//чтение статуса, без записи адреса но с dummy байтами
 void spi_EPCS_read  (u8 ,u32 ,u8 *,u32 );		//чтение с адресом

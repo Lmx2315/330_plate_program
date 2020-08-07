@@ -1,3 +1,60 @@
+07-08-2020
+----------
+рабочий файл по JTAG (самый топовый для нас сейчас) adiv5_jtagdp.с 
+
+
+
+Если ошибка :
+..\Src\jtag\cortexm.c(280): error:  #144: a value of type "int" cannot be used to initialize an entity of type "struct cortexm_priv *"
+то надо поставить: #include <stdlib.h>
+
+uint32_t fw_adiv5_jtagdp_read   //процедура чтения из JTAG 
+
+Пробуем использовать функции из adiv5_jtagdp.с 
+
+//---------------------------------------
+typedef struct jtag_dev_s {
+	union {
+		uint8_t dev;
+		uint8_t dr_prescan;
+	};
+	uint8_t dr_postscan;
+
+	uint8_t ir_len;
+	uint8_t ir_prescan;
+	uint8_t ir_postscan;
+	uint32_t idcode;
+	const char *descr;
+	uint32_t current_ir;
+} jtag_dev_t;
+//--------------------------------------
+
+typedef struct ADIv5_DP_s {
+	int refcnt;
+	uint32_t idcode;
+	uint32_t targetid;  /* Contains IDCODE for DPv2 devices.*/
+	uint32_t (*dp_read)(struct ADIv5_DP_s *dp, uint16_t addr);
+	uint32_t (*error)(struct ADIv5_DP_s *dp);
+	uint32_t (*low_access)(struct ADIv5_DP_s *dp, uint8_t RnW,
+                               uint16_t addr, uint32_t value);
+	void (*abort)(struct ADIv5_DP_s *dp, uint32_t abort);
+
+	uint32_t (*ap_read)(ADIv5_AP_t *ap, uint16_t addr);
+	void (*ap_write)(ADIv5_AP_t *ap, uint16_t addr, uint32_t value);
+
+	void (*mem_read)(ADIv5_AP_t *ap, void *dest, uint32_t src, size_t len);
+	void (*mem_write_sized)(ADIv5_AP_t *ap, uint32_t dest, const void *src,
+							size_t len, enum align align);
+	union {
+		jtag_dev_t *dev;
+		uint8_t fault;
+	};
+
+} ADIv5_DP_t;
+
+-----------------------------------------------------------------------------------------------
+
+
 30-07-2020
 ----------
 Если соеденить плату с 330 блоком кабелем JTAG (lvds) то работают команды определения сколько тапов в чейне JTAG и чтение сериного ID у мк.

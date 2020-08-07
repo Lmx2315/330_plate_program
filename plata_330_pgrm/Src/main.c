@@ -654,7 +654,7 @@ unsigned int leng ( char *s)
   return i;
 }
 
-void Transf(char* s)  // процедура отправки строки символов в порт
+void Transf(const char* s)  // процедура отправки строки символов в порт
 {
   unsigned  short l=0;
   unsigned  short i=0;
@@ -1120,11 +1120,27 @@ if (packet_ok==1u)
 if (crc_ok==0x3)  //обработка команд адресатом которых является хозяин 
 {
 
-if (strcmp(Word,"JTAG_SCAN")==0)                     
+if (strcmp(Word,"JTAG_TST")==0)                     
+   {
+	 crc_comp =atoi(DATA_Word);
+     Transf ("принял JTAG_TST\r"    );
+     Transf("\r"); 
+	 TST ();
+   } else	
+if (strcmp(Word,"JTAG2_SCAN")==0)                     
    {
 	 crc_comp =atoi(DATA_Word);
      Transf ("принял JTAG_SCAN\r"    );
-     Transf("\r");  
+     Transf("\r"); 
+	 crc_comp=jtag_scan(NULL); 
+//	 u_out("N:",crc_comp);
+//   JTAG_SCAN();
+   } else
+if (strcmp(Word,"JTAG1_SCAN")==0)                     
+   {
+	 crc_comp =atoi(DATA_Word);
+     Transf ("принял JTAG_SCAN\r"    );
+     Transf("\r"); 
      JTAG_SCAN();
    } else
 if (strcmp(Word,"JTAG_ID")==0)                     
@@ -1333,9 +1349,14 @@ u8 PIN_control_PD13 (void)
 {
   static u8 pn_old;
   u8 pn;
-  u8 flag;
+  u8 flag=0;
   pn=HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_13);
-  if (pn_old!=pn) {pn_old=pn;flag=1;} else flag=0;
+  if (pn_old!=pn) 
+  {
+	  pn_old=pn;
+	  if (pn==0) flag=1;
+	  } else flag=0;
+  
   return flag;
 }
 
@@ -1343,9 +1364,13 @@ u8 PIN_control_PD15 (void)
 {
   static u8 pn_old;
   u8 pn;
-  u8 flag;
+  u8 flag=0;
   pn=HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_15);
-  if (pn_old!=pn) {pn_old=pn;flag=1;} else flag=0;
+  if (pn_old!=pn) 
+  {
+	  pn_old=pn;
+	  if (pn==0) flag=1;
+	  } else flag=0;
   return flag;
 }
 

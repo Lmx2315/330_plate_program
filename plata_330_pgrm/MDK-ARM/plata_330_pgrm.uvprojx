@@ -441,6 +441,61 @@
               <FileType>1</FileType>
               <FilePath>..\Src\jtag_my.c</FilePath>
             </File>
+            <File>
+              <FileName>gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>jtagtap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\jtagtap.c</FilePath>
+            </File>
+            <File>
+              <FileName>jtagtap.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\jtagtap.h</FilePath>
+            </File>
+            <File>
+              <FileName>jtag_scan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\jtag_scan.c</FilePath>
+            </File>
+            <File>
+              <FileName>jtag_scan.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\jtag_scan.h</FilePath>
+            </File>
+            <File>
+              <FileName>jtag_devs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\jtag_devs.c</FilePath>
+            </File>
+            <File>
+              <FileName>jtag_devs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\jtag_devs.h</FilePath>
+            </File>
+            <File>
+              <FileName>crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>hex_utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\hex_utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>platform_support.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\platform_support.h</FilePath>
+            </File>
+            <File>
+              <FileName>timing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\jtag\timing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
