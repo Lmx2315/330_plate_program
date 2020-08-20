@@ -496,6 +496,31 @@
               <FileType>5</FileType>
               <FilePath>..\Src\jtag\timing.h</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\stm32f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>target.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\target.c</FilePath>
+            </File>
+            <File>
+              <FileName>cortexm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\cortexm.c</FilePath>
+            </File>
+            <File>
+              <FileName>exception.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\exception.c</FilePath>
+            </File>
+            <File>
+              <FileName>adiv5_jtagdp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\jtag\adiv5_jtagdp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

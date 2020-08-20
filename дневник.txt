@@ -1,3 +1,14 @@
+19-08-2020
+----------
+Функция очистки ФЛЭШ:
+
+int target_flash_erase(target *t, target_addr addr, size_t len)  (target.c)  - считает адрес смещения и вызывает команду erase(f, addr, tmplen);
+static void stm32f4_add_flash(target *t,uint32_t addr, size_t length, size_t blocksize,unsigned int base_sector, int split)
+ - эта функция описывает применяемую флешпамять в микроконтроллере использовать её не буквально а посмотреть что и как!!! 
+(stm32f4.c)
+
+Смотри файл - stm32f4.c !!!
+
 07-08-2020
 ----------
 рабочий файл по JTAG (самый топовый для нас сейчас) adiv5_jtagdp.с 
