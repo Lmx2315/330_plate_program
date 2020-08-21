@@ -96,8 +96,7 @@ int jtag_scan(const uint8_t *irlens)
 
 		Transf("Scanning out IRs\n\r");
 		if(!jtag_proc.jtagtap_next(0, 1)) {
-			Transf("jtag_scan: Sanity check failed: IR[0] shifted out "
-					   "as 0\n\r");
+			Transf("jtag_scan: Sanity check failed: IR[0] shifted out as 0\n\r");
 			jtag_dev_count = -1;
 			return -1; /* must be 1 */
 		}
@@ -112,6 +111,7 @@ int jtag_scan(const uint8_t *irlens)
 			} else jtag_devs[jtag_dev_count].ir_len++;
 			j++;
 		}
+		
 		if(jtag_dev_count > JTAG_MAX_DEVS) {
 			Transf("jtag_scan: Maximum device count exceeded\n\r");
 			jtag_dev_count = -1;
@@ -124,6 +124,7 @@ int jtag_scan(const uint8_t *irlens)
 		}
 	}
 
+	u_out("jtag_dev_count:",jtag_dev_count);
 	Transf("Return to Run-Test/Idle\n\r");
 	jtag_proc.jtagtap_next(1, 1);
 	jtagtap_return_idle();
@@ -137,8 +138,7 @@ int jtag_scan(const uint8_t *irlens)
 		jtag_devs[i].dr_postscan = jtag_dev_count - i - 1;
 
 	if(i != jtag_dev_count) {
-		Transf("jtag_scan: Sanity check failed: "
-			"BYPASS dev count doesn't match IR scan\n\r");
+		Transf("jtag_scan: Sanity check failed:BYPASS dev count doesn't match IR scan\n\r");
 		jtag_dev_count = -1;
 		return -1;
 	}
