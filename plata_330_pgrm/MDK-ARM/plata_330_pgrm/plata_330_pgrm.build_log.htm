@@ -26,7 +26,20 @@ Project File Date:  08/07/2020
 
 <h2>Output:</h2>
 Build target 'plata_330_pgrm'
-"plata_330_pgrm\plata_330_pgrm.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+../Src/main.c(1128): warning:  #223-D: function "TST" declared implicitly
+         TST ();
+../Src/main.c(1135): warning:  #223-D: function "jtag_scan" declared implicitly
+         crc_comp=jtag_scan(NULL); 
+../Src/main.c(1151): warning:  #223-D: function "ID_recive" declared implicitly
+       ID_recive (crc_comp);
+../Src/main.c(179): warning:  #177-D: function "MX_SPI2_Init" was declared but never referenced
+  static void MX_SPI2_Init(void)
+../Src/main.c: 4 warnings, 0 errors
+linking...
+Program Size: Code=23642 RO-data=1782 RW-data=168 ZI-data=12664  
+FromELF: creating hex file...
+"plata_330_pgrm\plata_330_pgrm.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 
