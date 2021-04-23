@@ -2615,9 +2615,9 @@
       </Doc>
       <Doc>
         <Name>../Src/main.c</Name>
-        <ColumnNumber>10</ColumnNumber>
-        <TopLine>1129</TopLine>
-        <CurrentLine>1152</CurrentLine>
+        <ColumnNumber>39</ColumnNumber>
+        <TopLine>1142</TopLine>
+        <CurrentLine>1167</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
@@ -2634,7 +2634,7 @@
       <Doc>
         <Name>..\Src\jtag\stm32f4.c</Name>
         <ColumnNumber>21</ColumnNumber>
-        <TopLine>168</TopLine>
+        <TopLine>170</TopLine>
         <CurrentLine>196</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
@@ -2643,7 +2643,7 @@
       <Doc>
         <Name>..\Src\jtag\target.c</Name>
         <ColumnNumber>1</ColumnNumber>
-        <TopLine>301</TopLine>
+        <TopLine>303</TopLine>
         <CurrentLine>379</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
@@ -2670,7 +2670,7 @@
       <Doc>
         <Name>..\Src\jtag\adiv5.h</Name>
         <ColumnNumber>23</ColumnNumber>
-        <TopLine>188</TopLine>
+        <TopLine>190</TopLine>
         <CurrentLine>194</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
