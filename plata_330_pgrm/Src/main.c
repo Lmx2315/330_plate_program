@@ -270,7 +270,7 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 1999;//даЄт период 500мкс * 2000 = 1 сек
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 49999;//на частоте 100 ћ√ц даЄт период 500 мкс
+  htim1.Init.Period = 50665;//на частоте 100 ћ√ц даЄт период 500 мкс
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
