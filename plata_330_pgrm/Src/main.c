@@ -270,7 +270,7 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 1999;//даЄт период 500мкс * 2000 = 1 сек
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 50665;//на частоте 100 ћ√ц даЄт период 500 мкс
+  htim1.Init.Period = 50000;//на частоте 100 ћ√ц даЄт период 500 мкс
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -340,9 +340,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 4;//определ€ет длинну импульса - тут 100 мкс
+  htim2.Init.Prescaler = 4;//даЄт период 500мкс * 2000 = 1 сек
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 1000;//определ€ет частоту импульса - тут 10 мс
+  htim2.Init.Period = 50000;//определ€ет частоту импульса - тут 10 мс
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
